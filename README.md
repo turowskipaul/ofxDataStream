@@ -1,7 +1,7 @@
 # ofxDataStream
 A utility addon for OpenFrameworks that manages and smooths streams of data
 
-Copyright (C) 2015 [Paul Turowski] (paulturowski.com)
+Copyright (C) 2015 [Paul Turowski] (http://paulturowski.com)
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
