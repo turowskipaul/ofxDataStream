@@ -45,6 +45,7 @@ void ofxDataStream::init(int _size) {
         deltaVals.push_back(0);
         triggers.push_back(false);
     }
+    // bonk vars are set in setBonk()
 
     streamSize = vals.size();
     isThreshed = false;
@@ -52,6 +53,7 @@ void ofxDataStream::init(int _size) {
     isNormalized = false;
     valRange = ofVec2f(0,1);
     isClamped = false;
+    isBonked = false;
     smoothingType = SMOOTHING_NONE;
     slideUp = 1;
     slideDown = 1;
@@ -89,19 +91,6 @@ void ofxDataStream::initSlide(float _sU, float _sD){
     smoothingType = SMOOTHING_SLIDE;
     slideUp = _sU;
     slideDown = _sD;
-
-    // reset if previously initiated
-    if (smoothHistos.size() > 0) {
-        for (int a=0; a<smoothHistos.size(); a++) {
-            smoothHistos.erase(smoothHistos.begin());
-        }
-    }
-    // create new history
-    vector<float> tempVector;
-    for (int i=0; i<streamSize; i++) {
-        tempVector.push_back(0);
-    }
-    smoothHistos.push_back(tempVector);
 }
 //-------------------------------------------------------------------------
 void ofxDataStream::update(const vector<float>& _vals) {
@@ -110,8 +99,18 @@ void ofxDataStream::update(const vector<float>& _vals) {
         return;
     }
 
+    // reset max values
+    maxValue = 0.0;
+    maxValueN = 0.0;
+    
     for (int i=0; i<streamSize; i++) {
         update(_vals[i], i);
+        if (vals[i] > maxValue) {
+            maxValue = vals[i];
+        }
+        if (valsN[i] > maxValueN) {
+            maxValueN = valsN[i];
+        }
     }
 }
 
@@ -125,6 +124,7 @@ void ofxDataStream::update(float _val, int _idx) {
     vals[_idx] = _val;
 
     // get the delta value
+    // (used in the smooth method)
     deltaVals[_idx] = vals[_idx] - prevVals[_idx];
 
     // smooth vals
@@ -136,6 +136,26 @@ void ofxDataStream::update(float _val, int _idx) {
     // clamp the value
     if (isClamped) {
         vals[_idx] = ofClamp(vals[_idx], clampLo, clampHi);
+    }
+    
+    // update bonks
+    if (isBonked) {
+        // recalculate delta for smoothing/clamping
+        float smoothedDelta = vals[_idx] - prevVals[_idx];
+        
+        if (smoothedDelta >= bonkHi) {
+            bonkVals[_idx] = true;
+        }
+        else if (smoothedDelta <= bonkLo) {
+            bonkVals[_idx] = false;
+        }
+        
+        if (bonkVals[_idx] && !bonkPrevVals[_idx]) {
+            bonks[_idx] = true;
+        }
+        else bonks[_idx] = false;
+        
+        bonkPrevVals[_idx] = bonkVals[_idx];
     }
 
     // store the new value in previous value
@@ -237,6 +257,20 @@ void ofxDataStream::setClamp(bool _c, float _lo, float _hi) {
     clampHi = _hi;
 }
 
+void ofxDataStream::setBonk(float _hiThresh, float _loThresh) {
+    isBonked = true;
+    bonkHi = _hiThresh;
+    bonkLo = _loThresh;
+    
+    for (int v=0; v<streamSize; v++) {
+        bonkVals.push_back(false);
+        bonkPrevVals.push_back(false);
+        bonks.push_back(false);
+    }
+}
+
+//-------------------------------------------------------------------------
+
 float ofxDataStream::getValue(int _idx) {
     if (_idx < 0 || _idx >= streamSize) {
         ofLogError("ofxDataStream") << "getValue(): index doesn't exist";
@@ -272,9 +306,28 @@ bool ofxDataStream::getTrigger(int _idx) {
     return returnedTrig;
 }
 
+bool ofxDataStream::getBonk(int _idx) {
+    bool returnedBonk = false;
+    
+    if (!isBonked) {
+        ofLogError("ofxDataStream") << "getBonk(): need to call setBonk first";
+    }
+    else if (_idx < 0 || _idx >= streamSize) {
+        ofLogError("ofxDataStream") << "getBonk(): index doesn't exist";
+    }
+    else returnedBonk = bonks[_idx];
+    
+    return returnedBonk;
+}
+
+float ofxDataStream::getMaxVal() {return maxValue;}
+
+float ofxDataStream::getMaxValN() {return maxValueN;}
+
 void ofxDataStream::setMeanType(ofxDataStream::Mean_t _type) {meanType = _type;}
 //-------------------------------------------------------------------------
 const vector<float>& ofxDataStream::getStream() {return vals;}
 const vector<float>& ofxDataStream::getStreamN() {return valsN;}
 const vector<bool>& ofxDataStream::getTriggers() {return triggers;}
-const vector<float>& ofxDataStream::getActivity() {return deltaVals;}
+const vector<float>& ofxDataStream::getDeltas() {return deltaVals;}
+const vector<bool>& ofxDataStream::getBonks() {return bonks;}

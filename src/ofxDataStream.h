@@ -34,12 +34,19 @@ class ofxDataStream {
     vector<float> valsN;
     vector<float> deltaVals;
     vector<bool> triggers;
+    vector<bool> bonkVals;
+    vector<bool> bonkPrevVals;
+    vector<bool> bonks;
     bool isThreshed;
     float thresh;
     bool isNormalized;
     ofVec2f valRange;
     bool isClamped;
     float clampLo, clampHi;
+    bool isBonked;
+    float bonkLo, bonkHi;
+    float maxValue;
+    float maxValueN;
 
     // SMOOTHING
     vector<vector<float> > smoothHistos;
@@ -83,14 +90,20 @@ public:
     ofVec2f getRange();
 
     void setClamp(bool _c, float _lo=0, float _hi=1);
+    void setBonk(float _hi=0.1, float _lo=0);
+    
     float getValue(int _idx=0);
     float getValueN(int _idx=0);
     float getDeltaValue(int _idx=0);
     bool getTrigger(int _idx=0);
+    bool getBonk(int _idx=0);
+    float getMaxVal();
+    float getMaxValN();
     void setMeanType(Mean_t _type);
 
     const vector<float>& getStream();
     const vector<float>& getStreamN();
     const vector<bool>& getTriggers();
-    const vector<float>& getActivity();
+    const vector<float>& getDeltas();
+    const vector<bool>& getBonks();
 };
