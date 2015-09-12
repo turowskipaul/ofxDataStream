@@ -39,6 +39,8 @@ class ofxDataStream {
     vector<bool> bonks;
     bool isThreshed;
     float thresh;
+    bool isDecayingGrowing;
+    float decayGrowRatio;
     bool isNormalized;
     ofVec2f valRange;
     bool isClamped;
@@ -83,13 +85,15 @@ public:
     void setThreshN(float _tN);
     float getThresh();
     float getThreshN();
-    void setNormalized(bool _n, ofVec2f _range = ofVec2f(0,1));
+    void setDecayGrow(bool _isDG=true, float _ratio=0.99);
+    bool getDecayingGrowing();
+    void setNormalized(bool _n=true, ofVec2f _range = ofVec2f(0,1));
     void setRange(ofVec2f _range);
     void setRangeLo(int _idx=0);
     void setRangeHi(int _idx=0);
     ofVec2f getRange();
 
-    void setClamp(bool _c, float _lo=0, float _hi=1);
+    void setClamp(bool _c=true, float _lo=0, float _hi=1);
     void setBonk(float _hi=0.1, float _lo=0);
     
     float getValue(int _idx=0);

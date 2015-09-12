@@ -50,6 +50,8 @@ void ofxDataStream::init(int _size) {
     streamSize = vals.size();
     isThreshed = false;
     thresh = 0.0;
+    isDecayingGrowing = false;
+    decayGrowRatio = 1.0;
     isNormalized = false;
     valRange = ofVec2f(0,1);
     isClamped = false;
@@ -131,6 +133,11 @@ void ofxDataStream::update(float _val, int _idx) {
     if (smoothingType == SMOOTHING_ACCUM ||
         smoothingType == SMOOTHING_SLIDE) {
         vals[_idx] = smooth(_idx, vals[_idx]);
+    }
+    
+    if (isDecayingGrowing) {
+        float valDiff = vals[_idx] - (vals[_idx] * decayGrowRatio);
+        vals[_idx] -= valDiff * ofGetLastFrameTime();
     }
 
     // clamp the value
@@ -231,6 +238,13 @@ float ofxDataStream::getThresh() {return thresh;}
 
 float ofxDataStream::getThreshN() {return (thresh - valRange.x) / (valRange.y - valRange.x);}
 
+void ofxDataStream::setDecayGrow(bool _isDG, float _ratio) {
+    isDecayingGrowing = _isDG;
+    decayGrowRatio = _ratio;
+}
+
+bool ofxDataStream::getDecayingGrowing() {return isDecayingGrowing;}
+
 void ofxDataStream::setNormalized(bool _n, ofVec2f _range) {
     if (_range.y - _range.x == 0) {
         ofLogError("ofxDataStream") << "setNormalized(): value range cannot be zero";
@@ -252,7 +266,7 @@ void ofxDataStream::setRangeHi(int _idx) {
 ofVec2f ofxDataStream::getRange() {return valRange;}
 //-------------------------------------------------------------------------
 void ofxDataStream::setClamp(bool _c, float _lo, float _hi) {
-    isClamped = true;
+    isClamped = _c;
     clampLo = _lo;
     clampHi = _hi;
 }
