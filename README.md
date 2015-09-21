@@ -74,6 +74,16 @@ amp.getValue(0); // index (optional)
 amp.getValueN(0); // get normalized value (index optional)
 </pre>
 
+detect "bonks" (onsets):
+<pre>
+amp.setBonk(hiThresh, loThresh);
+</pre>
+
+set growth/decay:
+<pre>
+amp.setDecayGrow(true, decayRatio);
+</pre>
+
 Development
 -----------
 Bug reports, suggestions, and further development are all welcome.
