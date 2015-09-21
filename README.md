@@ -76,12 +76,12 @@ amp.getValueN(0); // get normalized value (index optional)
 
 detect "bonks" (onsets):
 <pre>
-amp.setBonk(hiThresh, loThresh);
+amp.setBonk(0.1, 0.1);  // min growth for onset, min decay
 </pre>
 
 set growth/decay:
 <pre>
-amp.setDecayGrow(true, decayRatio);
+amp.setDecayGrow(true, 0.99); // a framerate-dependent steady decay/growth
 </pre>
 
 Development
