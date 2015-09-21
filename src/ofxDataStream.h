@@ -39,7 +39,6 @@ class ofxDataStream {
     vector<bool> bonks;
     bool isThreshed;
     float thresh;
-    bool isDecayingGrowing;
     float decayGrowRatio;
     bool isNormalized;
     ofVec2f valRange;
@@ -85,8 +84,7 @@ public:
     void setThreshN(float _tN);
     float getThresh();
     float getThreshN();
-    void setDecayGrow(bool _isDG=true, float _ratio=0.99);
-    bool getDecayingGrowing();
+    void setDecayGrow(float _ratio=1.0);
     void setNormalized(bool _n=true, ofVec2f _range = ofVec2f(0,1));
     void setRange(ofVec2f _range);
     void setRangeLo(int _idx=0);
