@@ -84,7 +84,20 @@ set growth/decay:
 amp.setDecayGrow(true, 0.99); // a framerate-dependent steady decay/growth
 </pre>
 
+get direction change time (sec) and depth:
+<pre>
+// if the direction has changed and
+// if the time of change is greater than 0.5 sec
+// print the time between changes and amount of change
+
+if (inputStreams[0].getDirectionTimeDiff() > 0.5 &&
+        inputStreams[0].directionHasChanged()) {
+        ofLogNotice() <<
+        "inputStream1 " << inputStreams[0].getDirectionTimeDiff() <<
+        " " << inputStreams[0].getDirectionValDiff();
+    }
+</pre>
+
 Development
 -----------
 Bug reports, suggestions, and further development are all welcome.
-

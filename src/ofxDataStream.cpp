@@ -25,7 +25,7 @@
 ofxDataStream::ofxDataStream() {
     // ofxDataStream(1);
     // note: delegating constructors only works in c++ 11
-    // which doesn't seem to implemented in OF yet...
+    // which isn't implemented in OF 0.8.4
     init(1);
 }
 
@@ -44,6 +44,13 @@ void ofxDataStream::init(int _size) {
         valsN.push_back(0);
         deltaVals.push_back(0);
         triggers.push_back(false);
+        
+        // derivative data
+        directions.push_back(STATIC);
+        timeStamps.push_back(ofGetElapsedTimef());
+        valStamps.push_back(0);
+        directionChangeTimes.push_back(0);
+        directionChangeVals.push_back(0);
     }
     // bonk vars are set in setBonk()
 
@@ -58,6 +65,9 @@ void ofxDataStream::init(int _size) {
     smoothingType = SMOOTHING_NONE;
     slideUp = 1;
     slideDown = 1;
+    
+    directionChangeCalculated = false;
+    newDirection = false;
 }
 //-------------------------------------------------------------------------
 void ofxDataStream::initAccum(int _depth){
@@ -162,6 +172,37 @@ void ofxDataStream::update(float _val, int _idx) {
         else bonks[_idx] = false;
         
         bonkPrevVals[_idx] = bonkVals[_idx];
+    }
+    
+    // calculate direction changes
+    if (directionChangeCalculated) {
+        if (vals[_idx] == prevVals[_idx] && directions[_idx] != STATIC) {
+            directions[_idx] = STATIC;
+            timeStamps[_idx] = ofGetElapsedTimef();
+        }
+        else {
+            if ((vals[_idx] > prevVals[_idx] && directions[_idx] != INCREASING) ||
+                (vals[_idx] < prevVals[_idx] && directions[_idx] != DECREASING)) {
+                newDirection = true;
+                
+                // calculate the time between direction changes
+                directionChangeTimes[_idx] = ofGetElapsedTimef() - timeStamps[_idx];
+                timeStamps[_idx] = ofGetElapsedTimef();
+                
+                // calculate the depth of the change (uses smoothed/clamped vals)
+                directionChangeVals[_idx] = vals[_idx] - valStamps[_idx];
+                if (directionChangeVals[_idx] < 0) {
+                    directions[_idx] = DECREASING;
+                }
+                else {
+                    directions[_idx] = INCREASING;
+                }
+                valStamps[_idx] = vals[_idx];
+            }
+            else {
+                newDirection = false;
+            }
+        }
     }
 
     // store the new value in previous value
@@ -335,6 +376,37 @@ float ofxDataStream::getMaxVal() {return maxValue;}
 float ofxDataStream::getMaxValN() {return maxValueN;}
 
 void ofxDataStream::setMeanType(ofxDataStream::Mean_t _type) {meanType = _type;}
+//-------------------------------------------------------------------------
+float ofxDataStream::getDirectionTimeDiff(int _idx) {
+    float returnedDiff = false;
+    
+    if (!directionChangeCalculated) {
+        ofLogError("ofxDataStream") << "getDirectionTimeDiff(): directionChangeCalculated needs to enabled";
+    }
+    else if (_idx < 0 || _idx >= streamSize) {
+        ofLogError("ofxDataStream") << "getDirectionTimeDiff(): index doesn't exist";
+    }
+    else returnedDiff = directionChangeTimes[_idx];
+    
+    return returnedDiff;
+}
+
+float ofxDataStream::getDirectionValDiff(int _idx) {
+    float returnedDiff = false;
+    
+    if (!directionChangeCalculated) {
+        ofLogError("ofxDataStream") << "getDirectionValDiff(): directionChangeCalculated needs to enabled";
+    }
+    else if (_idx < 0 || _idx >= streamSize) {
+        ofLogError("ofxDataStream") << "getDirectionValDiff(): index doesn't exist";
+    }
+    else returnedDiff = directionChangeVals[_idx];
+    
+    return returnedDiff;
+}
+
+bool ofxDataStream::directionHasChanged() {return newDirection;}
+
 //-------------------------------------------------------------------------
 const vector<float>& ofxDataStream::getStream() {return vals;}
 const vector<float>& ofxDataStream::getStreamN() {return valsN;}

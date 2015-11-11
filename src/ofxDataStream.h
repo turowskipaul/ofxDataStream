@@ -56,6 +56,19 @@ class ofxDataStream {
     float slideDown;
 
     float smooth(int _idx, float _val);
+    
+    // DIRECTION
+    enum Direction_t {
+        STATIC,
+        DECREASING,
+        INCREASING
+    };
+    vector<Direction_t> directions;
+    vector<float> timeStamps;
+    vector<float> valStamps;
+    vector<float> directionChangeTimes;
+    vector<float> directionChangeVals;
+    bool newDirection;
 
 public:
     enum Smoothing_t {
@@ -69,6 +82,8 @@ public:
         MEAN_GEOM,
         MEAN_HARM,
     } meanType;
+    
+    bool directionChangeCalculated;
 
     ofxDataStream();
     ofxDataStream(int _size);
@@ -102,6 +117,10 @@ public:
     float getMaxVal();
     float getMaxValN();
     void setMeanType(Mean_t _type);
+    
+    float getDirectionTimeDiff(int _idx=0);
+    float getDirectionValDiff(int _idx=0);
+    bool directionHasChanged();
 
     const vector<float>& getStream();
     const vector<float>& getStreamN();
