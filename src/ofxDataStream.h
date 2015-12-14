@@ -111,6 +111,7 @@ public:
     
     float getValue(int _idx=0);
     float getValueN(int _idx=0);
+    float getValueAboveThreshN(int _idx=0);
     float getDeltaValue(int _idx=0);
     bool getTrigger(int _idx=0);
     bool getBonk(int _idx=0);

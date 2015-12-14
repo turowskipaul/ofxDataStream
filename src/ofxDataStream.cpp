@@ -338,6 +338,24 @@ float ofxDataStream::getValueN(int _idx) {
     return valsN[_idx];
 }
 
+float ofxDataStream::getValueAboveThreshN(int _idx) {
+    if (_idx < 0 || _idx >= streamSize) {
+        ofLogError("ofxDataStream") << "getValueAboveThreshN(): index doesn't exist";
+        return 0;
+    }
+    
+    if (getThreshN() == valRange.y) {
+        ofLogError("ofxDataStream") << "getValueAboveThreshN(): threshold == max value";
+        return 0;
+    }
+    
+    float valOverThresh = valsN[_idx] - getThreshN();
+    valOverThresh = ofClamp(valOverThresh, 0, 1);
+    float valNOverThresh = valOverThresh / (1.0 - getThreshN());
+    
+    return valNOverThresh;
+}
+
 float ofxDataStream::getDeltaValue(int _idx) {
     if (_idx < 0 || _idx >= streamSize) {
         ofLogError("ofxDataStream") << "getDeltaValue(): index doesn't exist";
