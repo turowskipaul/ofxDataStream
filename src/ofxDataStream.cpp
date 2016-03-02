@@ -38,6 +38,19 @@ void ofxDataStream::init(int _size) {
         ofLogError("ofxDataStream") << "ofxDataStream(): size must be at least 1";
         return;
     }
+    // first, clear all vectors in case they have been already set
+    prevVals.clear();
+    vals.clear();
+    valsN.clear();
+    deltaVals.clear();
+    triggers.clear();
+    directions.clear();
+    timeStamps.clear();
+    valStamps.clear();
+    directionChangeTimes.clear();
+    directionChangeVals.clear();
+    
+    // next, init the vectors
     for (int v=0; v<_size; v++) {
         prevVals.push_back(0);
         vals.push_back(0);
