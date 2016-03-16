@@ -412,7 +412,7 @@ float ofxDataStream::getDirectionTimeDiff(int _idx) {
     float returnedDiff = false;
     
     if (!directionChangeCalculated) {
-        ofLogError("ofxDataStream") << "getDirectionTimeDiff(): directionChangeCalculated needs to enabled";
+        ofLogError("ofxDataStream") << "getDirectionTimeDiff(): directionChangeCalculated needs to be enabled";
     }
     else if (_idx < 0 || _idx >= streamSize) {
         ofLogError("ofxDataStream") << "getDirectionTimeDiff(): index doesn't exist";
@@ -426,7 +426,7 @@ float ofxDataStream::getDirectionValDiff(int _idx) {
     float returnedDiff = false;
     
     if (!directionChangeCalculated) {
-        ofLogError("ofxDataStream") << "getDirectionValDiff(): directionChangeCalculated needs to enabled";
+        ofLogError("ofxDataStream") << "getDirectionValDiff(): directionChangeCalculated needs to be enabled";
     }
     else if (_idx < 0 || _idx >= streamSize) {
         ofLogError("ofxDataStream") << "getDirectionValDiff(): index doesn't exist";
@@ -444,3 +444,36 @@ const vector<float>& ofxDataStream::getStreamN() {return valsN;}
 const vector<bool>& ofxDataStream::getTriggers() {return triggers;}
 const vector<float>& ofxDataStream::getDeltas() {return deltaVals;}
 const vector<bool>& ofxDataStream::getBonks() {return bonks;}
+
+void ofxDataStream::reset(int _idx) {
+    // reset the value of a particular index
+    // if value is out of range, reset all indices
+    int tempStart = 0;
+    int tempRange = streamSize;
+    
+    if (_idx >= 0 && _idx < streamSize) {
+        tempStart = _idx;
+        tempRange = _idx+1;
+    }
+    
+    for (int i=tempStart; i<tempRange; i++) {
+        prevVals[i] = 0;
+        vals[i] = 0;
+        valsN[i] = 0;
+        deltaVals[i] = 0;
+        triggers[i] = 0;
+        directions[i] = STATIC;
+        timeStamps[i] = 0;
+        valStamps[i] = 0;
+        directionChangeTimes[i] = 0;
+        directionChangeVals[i] = 0;
+    }
+}
+
+
+
+
+
+
+
+

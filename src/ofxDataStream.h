@@ -128,4 +128,6 @@ public:
     const vector<bool>& getTriggers();
     const vector<float>& getDeltas();
     const vector<bool>& getBonks();
+    
+    void reset(int _idx=-1);
 };
