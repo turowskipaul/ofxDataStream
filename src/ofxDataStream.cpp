@@ -117,7 +117,7 @@ void ofxDataStream::initSlide(float _sU, float _sD){
     slideDown = _sD;
 }
 //-------------------------------------------------------------------------
-void ofxDataStream::update(const vector<float>& _vals) {
+void ofxDataStream::update(const vector<float>& _vals, bool _accum) {
     if (_vals.size() != streamSize) {
         ofLogError("ofxDataStream") << "update(): vector size mismatch";
         return;
@@ -128,7 +128,7 @@ void ofxDataStream::update(const vector<float>& _vals) {
     maxValueN = 0.0;
     
     for (int i=0; i<streamSize; i++) {
-        update(_vals[i], i);
+        update(_vals[i], i, _accum);
         if (vals[i] > maxValue) {
             maxValue = vals[i];
             maxValueN = valsN[i];
@@ -137,14 +137,19 @@ void ofxDataStream::update(const vector<float>& _vals) {
     }
 }
 
-void ofxDataStream::update(float _val, int _idx) {
+void ofxDataStream::update(float _val, int _idx, bool _accum) {
     if (_idx < 0 || _idx >= streamSize) {
         ofLogError("ofxDataStream") << "update(): index " << _idx << " doesn't exist";
         return;
     }
 
-    // store the new value
-    vals[_idx] = _val;
+    // store/accumulate the new value
+    if (_accum) {
+        vals[_idx] = prevVals[_idx] + _val;
+    }
+    else {
+        vals[_idx] = _val;
+    }
 
     // get the delta value
     // (used in the smooth method)

@@ -93,8 +93,8 @@ public:
     void initAccum(int _depth);
     void initSlide(float _sU, float _sD);
 
-    void update(const vector<float>& _vals);
-    void update(float _val, int _idx=0);
+    void update(const vector<float>& _vals, bool _accum=false);
+    void update(float _val, int _idx=0, bool _accum=false);
 
     void setThresh(float _t);
     void setThreshN(float _tN);
