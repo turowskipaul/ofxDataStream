@@ -131,16 +131,15 @@ void ofxDataStream::update(const vector<float>& _vals) {
         update(_vals[i], i);
         if (vals[i] > maxValue) {
             maxValue = vals[i];
-        }
-        if (valsN[i] > maxValueN) {
             maxValueN = valsN[i];
+            maxIdx = i;
         }
     }
 }
 
 void ofxDataStream::update(float _val, int _idx) {
     if (_idx < 0 || _idx >= streamSize) {
-        ofLogError("ofxDataStream") << "update(): index doesn't exist";
+        ofLogError("ofxDataStream") << "update(): index " << _idx << " doesn't exist";
         return;
     }
 
@@ -405,6 +404,8 @@ bool ofxDataStream::getBonk(int _idx) {
 float ofxDataStream::getMaxVal() {return maxValue;}
 
 float ofxDataStream::getMaxValN() {return maxValueN;}
+
+int ofxDataStream::getMaxIdx() {return maxIdx;}
 
 void ofxDataStream::setMeanType(ofxDataStream::Mean_t _type) {meanType = _type;}
 //-------------------------------------------------------------------------

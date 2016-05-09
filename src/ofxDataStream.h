@@ -48,6 +48,7 @@ class ofxDataStream {
     float bonkLo, bonkHi;
     float maxValue;
     float maxValueN;
+    int maxIdx;
 
     // SMOOTHING
     vector<vector<float> > smoothHistos;
@@ -117,6 +118,7 @@ public:
     bool getBonk(int _idx=0);
     float getMaxVal();
     float getMaxValN();
+    int getMaxIdx();
     void setMeanType(Mean_t _type);
     
     float getDirectionTimeDiff(int _idx=0);
