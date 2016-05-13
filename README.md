@@ -48,8 +48,8 @@ amp.initAccum(100); // size of history
 
 initializing clamping and/or normalization
 <pre>
-amp.setClamp(0.2, 0.8); // clamp min and max
-amp.setNormalized(true, 0.2, 0.8); // normalization, min, max
+amp.setOutputRange(0.2, 0.8); // clamp min and max (default 0 and 1)
+amp.setNormalized(true, 0.2, 0.8); // normalization, min, max, clamped (default is true)
 </pre>
 
 set a threshold:
