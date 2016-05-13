@@ -43,7 +43,6 @@ class ofxDataStream {
     bool isNormalized;
     ofVec2f valRange;
     bool isClamped;
-    float clampLo, clampHi;
     bool isBonked;
     float bonkLo, bonkHi;
     float maxValue;
@@ -92,22 +91,22 @@ public:
 
     void initAccum(int _depth);
     void initSlide(float _sU, float _sD);
-
-    void update(const vector<float>& _vals, bool _accum=false);
-    void update(float _val, int _idx=0, bool _accum=false);
+    
+    void incrUpdate(float _val, int _idx=-1);
+    void update(const vector<float>& _vals);
+    void update(float _val, int _idx=0);
 
     void setThresh(float _t);
     void setThreshN(float _tN);
     float getThresh();
     float getThreshN();
     void setDecayGrow(float _ratio=1.0);
-    void setNormalized(bool _n=true, ofVec2f _range = ofVec2f(0,1));
-    void setRange(ofVec2f _range);
-    void setRangeLo(int _idx=0);
-    void setRangeHi(int _idx=0);
+    void setNormalized(bool _n=true, ofVec2f _range = ofVec2f(0,1), bool _isClamped=true);
+    void setOutputRange(ofVec2f _range=ofVec2f(0,1));
+    void stampRangeLo(int _idx=0);
+    void stampRangeHi(int _idx=0);
     ofVec2f getRange();
 
-    void setClamp(bool _c=true, float _lo=0, float _hi=1);
     void setBonk(float _hi=0.1, float _lo=0);
     
     float getValue(int _idx=0);

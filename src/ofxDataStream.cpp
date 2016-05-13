@@ -117,7 +117,32 @@ void ofxDataStream::initSlide(float _sU, float _sD){
     slideDown = _sD;
 }
 //-------------------------------------------------------------------------
-void ofxDataStream::update(const vector<float>& _vals, bool _accum) {
+void ofxDataStream::incrUpdate(float _val, int _idx) {
+    // if index is -1 (default), update all
+    if (_idx == -1) {
+        // reset max values
+        maxValue = 0.0;
+        maxValueN = 0.0;
+        
+        for (int i=0; i<streamSize; i++) {
+            update(vals[i] + _val, i);
+            if (vals[i] > maxValue) {
+                maxValue = vals[i];
+                maxValueN = valsN[i];
+                maxIdx = i;
+            }
+        }
+    }
+    else if (_idx < -1 || _idx >= streamSize) {
+        ofLogError("ofxDataStream") << "update(): index " << _idx << " doesn't exist";
+        return;
+    }
+    else {
+        update(vals[_idx] + _val, _idx);
+    }
+}
+
+void ofxDataStream::update(const vector<float>& _vals) {
     if (_vals.size() != streamSize) {
         ofLogError("ofxDataStream") << "update(): vector size mismatch";
         return;
@@ -128,7 +153,7 @@ void ofxDataStream::update(const vector<float>& _vals, bool _accum) {
     maxValueN = 0.0;
     
     for (int i=0; i<streamSize; i++) {
-        update(_vals[i], i, _accum);
+        update(_vals[i], i);
         if (vals[i] > maxValue) {
             maxValue = vals[i];
             maxValueN = valsN[i];
@@ -137,19 +162,14 @@ void ofxDataStream::update(const vector<float>& _vals, bool _accum) {
     }
 }
 
-void ofxDataStream::update(float _val, int _idx, bool _accum) {
+void ofxDataStream::update(float _val, int _idx) {
     if (_idx < 0 || _idx >= streamSize) {
         ofLogError("ofxDataStream") << "update(): index " << _idx << " doesn't exist";
         return;
     }
 
-    // store/accumulate the new value
-    if (_accum) {
-        vals[_idx] = prevVals[_idx] + _val;
-    }
-    else {
-        vals[_idx] = _val;
-    }
+    // store the new value
+    vals[_idx] = _val;
 
     // get the delta value
     // (used in the smooth method)
@@ -164,11 +184,6 @@ void ofxDataStream::update(float _val, int _idx, bool _accum) {
     if (decayGrowRatio != 1.0) {
         float valDiff = vals[_idx] - (vals[_idx] * decayGrowRatio);
         vals[_idx] -= valDiff * ofGetLastFrameTime();
-    }
-
-    // clamp the value
-    if (isClamped) {
-        vals[_idx] = ofClamp(vals[_idx], clampLo, clampHi);
     }
     
     // update bonks
@@ -227,14 +242,15 @@ void ofxDataStream::update(float _val, int _idx, bool _accum) {
 
     // set trigger
     if (isThreshed) triggers[_idx] = vals[_idx] > thresh;
-
-    // end of the line for vals
-    valsN[_idx] = vals[_idx];
+    
+    // clamp the output
+    if (isClamped) {
+        vals[_idx] = ofClamp(vals[_idx], valRange.x, valRange.y);
+    }
 
     // normalize the value
     if (isNormalized) {
-        valsN[_idx] = ofClamp(valsN[_idx], valRange.x, valRange.y);
-        valsN[_idx] = (valsN[_idx] - valRange.x) / (valRange.y - valRange.x);
+        valsN[_idx] = (vals[_idx] - valRange.x) / (valRange.y - valRange.x);
     }
 }
 
@@ -299,32 +315,28 @@ void ofxDataStream::setDecayGrow(float _ratio) {
     decayGrowRatio = _ratio;
 }
 
-void ofxDataStream::setNormalized(bool _n, ofVec2f _range) {
+void ofxDataStream::setNormalized(bool _n, ofVec2f _range, bool _isClamped) {
     if (_range.y - _range.x == 0) {
         ofLogError("ofxDataStream") << "setNormalized(): value range cannot be zero";
         return;
     }
     isNormalized = _n;
     valRange = _range;
+    isClamped = _isClamped;
 }
 
-void ofxDataStream::setRange(ofVec2f _range) {
+void ofxDataStream::setOutputRange(ofVec2f _range) {
+    isClamped = true;
     valRange = _range;
 }
-void ofxDataStream::setRangeLo(int _idx) {
+void ofxDataStream::stampRangeLo(int _idx) {
     valRange.x = vals[_idx];
 }
-void ofxDataStream::setRangeHi(int _idx) {
+void ofxDataStream::stampRangeHi(int _idx) {
     valRange.y = vals[_idx];
 }
 ofVec2f ofxDataStream::getRange() {return valRange;}
 //-------------------------------------------------------------------------
-void ofxDataStream::setClamp(bool _c, float _lo, float _hi) {
-    isClamped = _c;
-    clampLo = _lo;
-    clampHi = _hi;
-}
-
 void ofxDataStream::setBonk(float _hiThresh, float _loThresh) {
     isBonked = true;
     bonkHi = _hiThresh;
