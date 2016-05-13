@@ -49,7 +49,7 @@ amp.initAccum(100); // size of history
 initializing clamping and/or normalization
 <pre>
 amp.setOutputRange(0.2, 0.8); // clamp min and max (default 0 and 1)
-amp.setNormalized(true, 0.2, 0.8); // normalization, min, max, clamped (default is true)
+amp.setNormalized(true, 0.2, 0.8); // normalization, min, max, clamped (optional, default true)
 </pre>
 
 set a threshold:
@@ -66,6 +66,7 @@ update with incoming values:
 <pre>
 amp.update(rawAmplitude, 0); // raw value, index (optional)
 specAmps.update(spectralAmplitudes); // or update with a const vector ref
+amp.incrUpdate(rawAmplitudeDiff); //increment current value and update
 </pre>
 
 get a smoothed value (update updating):

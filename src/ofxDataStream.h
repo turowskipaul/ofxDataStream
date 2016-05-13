@@ -37,11 +37,11 @@ class ofxDataStream {
     vector<bool> bonkVals;
     vector<bool> bonkPrevVals;
     vector<bool> bonks;
+    ofVec2f valRange;
     bool isThreshed;
     float thresh;
     float decayGrowRatio;
     bool isNormalized;
-    ofVec2f valRange;
     bool isClamped;
     bool isBonked;
     float bonkLo, bonkHi;

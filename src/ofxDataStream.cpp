@@ -38,7 +38,7 @@ void ofxDataStream::init(int _size) {
         ofLogError("ofxDataStream") << "ofxDataStream(): size must be at least 1";
         return;
     }
-    // first, clear all vectors in case they have been already set
+    // clear all vectors in case they have been already set
     prevVals.clear();
     vals.clear();
     valsN.clear();
@@ -50,13 +50,14 @@ void ofxDataStream::init(int _size) {
     directionChangeTimes.clear();
     directionChangeVals.clear();
     
-    // next, init the vectors
+    // allocate and initialize vectors
     for (int v=0; v<_size; v++) {
         prevVals.push_back(0);
         vals.push_back(0);
         valsN.push_back(0);
         deltaVals.push_back(0);
         triggers.push_back(false);
+        // bonk vars are allocated in setBonk()
         
         // derivative data
         directions.push_back(STATIC);
@@ -65,7 +66,6 @@ void ofxDataStream::init(int _size) {
         directionChangeTimes.push_back(0);
         directionChangeVals.push_back(0);
     }
-    // bonk vars are set in setBonk()
 
     streamSize = vals.size();
     isThreshed = false;
