@@ -1,3 +1,8 @@
+Note: this project is no longer maintained and has been archived.
+
+For a similar addon that is more current, check out:
+https://github.com/moebiussurfing/ofxSurfingSmooth
+
 # ofxDataStream
 A utility addon for OpenFrameworks that manages and smooths streams of data
 
@@ -98,7 +103,3 @@ if (inputStreams[0].getDirectionTimeDiff() > 0.5 &&
         " " << inputStreams[0].getDirectionValDiff();
     }
 </pre>
-
-Development
------------
-Bug reports, suggestions, and further development are all welcome.
