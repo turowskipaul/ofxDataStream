@@ -1,8 +1,9 @@
-Note: this project is no longer maintained and has been archived.
+<b>Note: this project is no longer maintained and has been archived.
 
 For a similar addon that is more current, check out:
 https://github.com/moebiussurfing/ofxSurfingSmooth
-
+</b>
+        
 # ofxDataStream
 A utility addon for OpenFrameworks that manages and smooths streams of data
 
